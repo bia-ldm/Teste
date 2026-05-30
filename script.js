@@ -1,3 +1,4 @@
+
 const alunos = [];
 
 const situacoesMap = new Map([
@@ -10,7 +11,9 @@ let indiceAlunoSelecionado = null;
 let desafioAtual = null;
 let tentativasRestantes = 3;
 
-// elementos da DOM
+// ===============================
+// elementos DOM
+// ===============================
 
 const form = document.getElementById("form-estudante");
 const alertaErro = document.getElementById("alerta-erro");
@@ -31,49 +34,33 @@ const btnNovoDesafio = document.getElementById("btn-novo-desafio");
 
 const btnToggleDark = document.getElementById("toggle-dark");
 
+
 // calculo da média ponderada 
-
 function calcularMediaPonderada(n1, n2, n3) {
-  const peso1 = 3;
-  const peso2 = 3;
-  const peso3 = 4;
-  const somaPesos = peso1 + peso2 + peso3;
+  const pesos = [3, 3, 4];
+  const somaPesos = pesos.reduce((a, b) => a + b, 0);
 
-  const media = (n1 * peso1 + n2 * peso2 + n3 * peso3) / somaPesos;
+  const media = (n1 * pesos[0] + n2 * pesos[1] + n3 * pesos[2]) / somaPesos;
   return Number(media.toFixed(2));
 }
 
 function calcularFrequencia(presencas, aulasTotais) {
-  const freq = (presencas / aulasTotais) * 100;
-  return Number(freq.toFixed(1));
+  return Number(((presencas / aulasTotais) * 100).toFixed(1));
 }
 
 function determinarSituacao(media, frequencia) {
-  if (media >= 7 && frequencia >= 75) {
-    return "APROVADO";
-  } else if (media >= 5) {
-    return "RECUPERACAO";
-  } else {
-    return "REPROVADO";
-  }
+  return media >= 7 && frequencia >= 75
+    ? "APROVADO"
+    : media >= 5
+    ? "RECUPERACAO"
+    : "REPROVADO";
 }
 
 function determinarConceito(media) {
-  let conceito;
-  switch (true) {
-    case media >= 9:
-      conceito = "A";
-      break;
-    case media >= 7:
-      conceito = "B";
-      break;
-    case media >= 5:
-      conceito = "C";
-      break;
-    default:
-      conceito = "D";
-  }
-  return conceito;
+  if (media >= 9) return "A";
+  if (media >= 7) return "B";
+  if (media >= 5) return "C";
+  return "D";
 }
 
 function validarNumero(valor, min, max, campo) {
@@ -81,20 +68,16 @@ function validarNumero(valor, min, max, campo) {
     throw new Error(`O campo "${campo}" deve ser um número válido.`);
   }
   if (valor < min || valor > max) {
-    if (max === Infinity) {
-      throw new Error(`O campo "${campo}" deve ser maior ou igual a ${min}.`);
-    } else {
-      throw new Error(`O campo "${campo}" deve estar entre ${min} e ${max}.`);
-    }
+    const limite = max === Infinity ? `maior ou igual a ${min}` : `entre ${min} e ${max}`;
+    throw new Error(`O campo "${campo}" deve estar ${limite}.`);
   }
 }
 
 function limitarDecimais(input) {
   input.addEventListener("input", () => {
     if (input.value.includes(".")) {
-      const partes = input.value.split(".");
-      partes[1] = partes[1].slice(0, 2);
-      input.value = partes.join(".");
+      const [inteiro, decimal] = input.value.split(".");
+      input.value = `${inteiro}.${decimal.slice(0, 2)}`;
     }
   });
 }
@@ -102,11 +85,9 @@ function limitarDecimais(input) {
 // numero do telefone determinado
 function aplicarMascaraTelefone(input) {
   input.addEventListener("input", () => {
-    let valor = input.value.replace(/\D/g, ""); // só quero númros 
+    let valor = input.value.replace(/\D/g, "");
 
-    if (valor.length > 11) {
-      valor = valor.slice(0, 11);
-    }
+    if (valor.length > 11) valor = valor.slice(0, 11);
 
     if (valor.length > 2 && valor.length <= 7) {
       valor = `${valor.slice(0, 2)} ${valor.slice(2)}`;
@@ -118,21 +99,23 @@ function aplicarMascaraTelefone(input) {
   });
 }
 
+// formato numero do telefone 
 function validarTelefoneFormato(telefone) {
   const regex = /^\d{2} \d{5}-\d{4}$/;
   if (!regex.test(telefone)) {
-    throw new Error(
-      'O telefone deve estar no formato "xx xxxxx-xxxx".'
-    );
+    throw new Error('O telefone deve estar no formato "xx xxxxx-xxxx".');
   }
 }
 
-// limitar decimais e numeros 
 
 limitarDecimais(document.getElementById("nota1"));
 limitarDecimais(document.getElementById("nota2"));
 limitarDecimais(document.getElementById("nota3"));
 aplicarMascaraTelefone(document.getElementById("telefone"));
+
+// ===============================
+// cadastro dos alunos 
+// ===============================
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -189,13 +172,13 @@ form.addEventListener("submit", (event) => {
     alunos.push(aluno);
     form.reset();
     renderizarLista();
+
   } catch (erro) {
     alertaErro.textContent = erro.message;
     alertaErro.classList.remove("hidden");
   }
 });
 
-// alunos e situação
 
 function renderizarLista() {
   tabelaBody.innerHTML = "";
@@ -205,14 +188,15 @@ function renderizarLista() {
   const filtroStatus = filtroStatusSelect.value;
 
   for (const [indice, aluno] of alunos.entries()) {
-    if (termoBusca && !aluno.nome.toLowerCase().includes(termoBusca)) {
-      continue;
-    }
-    if (filtroStatus && aluno.situacao !== filtroStatus) {
-      continue;
-    }
 
-    // tabela de alunos e situação
+    // filtros
+    if (termoBusca && !aluno.nome.toLowerCase().includes(termoBusca)) continue;
+    if (filtroStatus && aluno.situacao !== filtroStatus) continue;
+
+    // ===============================
+    // listar alunos
+    // ===============================
+
     const tr = document.createElement("tr");
     tr.dataset.indice = indice;
 
@@ -226,39 +210,34 @@ function renderizarLista() {
     tdFreq.textContent = aluno.frequencia.toFixed(1) + "%";
 
     const tdSituacao = document.createElement("td");
-    const situacaoExtenso = situacoesMap.get(aluno.situacao) || "Indefinida";
+    const situacaoExtenso = situacoesMap.get(aluno.situacao) ?? "Indefinida";
     tdSituacao.textContent = situacaoExtenso;
 
-    if (aluno.situacao === "APROVADO") {
-      tdSituacao.classList.add("status-aprovado");
-    } else if (aluno.situacao === "RECUPERACAO") {
-      tdSituacao.classList.add("status-recuperacao");
-    } else {
-      tdSituacao.classList.add("status-reprovado");
-    }
+    // classes de status
+    const statusClass = 
+      aluno.situacao === "APROVADO"
+        ? "status-aprovado"
+        : aluno.situacao === "RECUPERACAO"
+        ? "status-recuperacao"
+        : "status-reprovado";
+
+    tdSituacao.classList.add(statusClass);
 
     const tdConceito = document.createElement("td");
     tdConceito.textContent = aluno.conceito;
 
     const tdTelefone = document.createElement("td");
-    tdTelefone.textContent = aluno.responsavel?.telefone || "-";
+    tdTelefone.textContent = aluno.responsavel?.telefone ?? "-";
 
     const tdEmail = document.createElement("td");
-    tdEmail.textContent =
-      aluno.responsavel?.email ?? "E-mail não informado";
+    tdEmail.textContent = aluno.responsavel?.email ?? "E-mail não informado";
 
-    tr.appendChild(tdNome);
-    tr.appendChild(tdMedia);
-    tr.appendChild(tdFreq);
-    tr.appendChild(tdSituacao);
-    tr.appendChild(tdConceito);
-    tr.appendChild(tdTelefone);
-    tr.appendChild(tdEmail);
+    tr.append(tdNome, tdMedia, tdFreq, tdSituacao, tdConceito, tdTelefone, tdEmail);
 
     tr.addEventListener("click", () => selecionarAluno(indice));
     tabelaBody.appendChild(tr);
 
-    // CARDS de alunos e situação
+
     const card = document.createElement("div");
     card.className = "card-aluno";
     card.dataset.indice = indice;
@@ -274,19 +253,18 @@ function renderizarLista() {
     tagSpan.className = "card-aluno-tag";
     tagSpan.textContent = situacaoExtenso;
 
-    if (aluno.situacao === "APROVADO") {
-      tagSpan.style.background = "#e8f5e9";
-      tagSpan.style.color = "#1b5e20";
-    } else if (aluno.situacao === "RECUPERACAO") {
-      tagSpan.style.background = "#fff8e1";
-      tagSpan.style.color = "#f9a825";
-    } else {
-      tagSpan.style.background = "#ffebee";
-      tagSpan.style.color = "#c62828";
-    }
+    // cores do card
+    const cores = {
+      APROVADO: ["#e8f5e9", "#1b5e20"],
+      RECUPERACAO: ["#fff8e1", "#f9a825"],
+      REPROVADO: ["#ffebee", "#c62828"]
+    };
 
-    header.appendChild(nomeSpan);
-    header.appendChild(tagSpan);
+    const [bg, cor] = cores[aluno.situacao] ?? ["#eee", "#333"];
+    tagSpan.style.background = bg;
+    tagSpan.style.color = cor;
+
+    header.append(nomeSpan, tagSpan);
 
     const body = document.createElement("div");
     body.className = "card-aluno-body";
@@ -294,14 +272,11 @@ function renderizarLista() {
       <span><strong>Média:</strong> ${aluno.media.toFixed(2)}</span>
       <span><strong>Freq.:</strong> ${aluno.frequencia.toFixed(1)}%</span>
       <span><strong>Conceito:</strong> ${aluno.conceito}</span>
-      <span><strong>Tel.:</strong> ${aluno.responsavel?.telefone || "-"}</span>
-      <span><strong>E-mail:</strong> ${
-        aluno.responsavel?.email ?? "E-mail não informado"
-      }</span>
+      <span><strong>Tel.:</strong> ${aluno.responsavel?.telefone ?? "-"}</span>
+      <span><strong>E-mail:</strong> ${aluno.responsavel?.email ?? "E-mail não informado"}</span>
     `;
 
-    card.appendChild(header);
-    card.appendChild(body);
+    card.append(header, body);
 
     card.addEventListener("click", () => selecionarAluno(indice));
     cardsAlunosContainer.appendChild(card);
@@ -311,7 +286,9 @@ function renderizarLista() {
 buscaNomeInput.addEventListener("input", renderizarLista);
 filtroStatusSelect.addEventListener("change", renderizarLista);
 
+// ===============================
 // game
+// ===============================
 
 function selecionarAluno(indice) {
   indiceAlunoSelecionado = indice;
@@ -330,8 +307,7 @@ function selecionarAluno(indice) {
 
 function gerarNovoDesafio() {
   if (indiceAlunoSelecionado === null) {
-    perguntaDesafioDiv.textContent =
-      "Selecione um aluno";
+    perguntaDesafioDiv.textContent = "Selecione um aluno";
     desafioAtual = null;
     return;
   }
@@ -346,10 +322,10 @@ function gerarNovoDesafio() {
   const operacoes = ["+", "-", "*"];
   const op = operacoes[Math.floor(Math.random() * operacoes.length)];
 
-  let resultado;
-  if (op === "+") resultado = a + b;
-  if (op === "-") resultado = a - b;
-  if (op === "*") resultado = a * b;
+  const resultado =
+    op === "+" ? a + b :
+    op === "-" ? a - b :
+    a * b;
 
   desafioAtual = { a, b, op, resultado };
 
@@ -359,15 +335,13 @@ function gerarNovoDesafio() {
 
 btnVerificarDesafio.addEventListener("click", () => {
   if (indiceAlunoSelecionado === null) {
-    feedbackDesafioDiv.textContent =
-      "Clique em um aluno na lista.";
+    feedbackDesafioDiv.textContent = "Clique em um aluno na lista.";
     feedbackDesafioDiv.className = "feedback erro";
     return;
   }
 
   if (!desafioAtual) {
-    feedbackDesafioDiv.textContent =
-      "Nenhum desafio ativo. Gere um novo desafio.";
+    feedbackDesafioDiv.textContent = "Nenhum desafio ativo. Gere um novo desafio.";
     feedbackDesafioDiv.className = "feedback erro";
     return;
   }
@@ -411,19 +385,16 @@ btnVerificarDesafio.addEventListener("click", () => {
   }
 });
 
-btnNovoDesafio.addEventListener("click", () => {
-  gerarNovoDesafio();
-});
+btnNovoDesafio.addEventListener("click", gerarNovoDesafio);
+renderizarLista();
+gerarNovoDesafio();
 
+// ===============================
 // modo escuro
+// ===============================
 
 btnToggleDark.addEventListener("click", () => {
   document.body.classList.toggle("dark");
 });
-
-
-
-renderizarLista();
-gerarNovoDesafio();
 
 
