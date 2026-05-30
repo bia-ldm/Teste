@@ -31,7 +31,7 @@ const btnNovoDesafio = document.getElementById("btn-novo-desafio");
 
 const btnToggleDark = document.getElementById("toggle-dark");
 
-// calcula média ponderada com pesos 3, 3 e 4 para as notas respectivamente
+// calculo da média ponderada 
 
 function calcularMediaPonderada(n1, n2, n3) {
   const peso1 = 3;
@@ -102,7 +102,7 @@ function limitarDecimais(input) {
 // numero do telefone determinado
 function aplicarMascaraTelefone(input) {
   input.addEventListener("input", () => {
-    let valor = input.value.replace(/\D/g, ""); // só dígitos
+    let valor = input.value.replace(/\D/g, ""); // só quero númros 
 
     if (valor.length > 11) {
       valor = valor.slice(0, 11);
@@ -212,7 +212,7 @@ function renderizarLista() {
       continue;
     }
 
-    // TABELA DE ALUNOS E SITUAÇÃO
+    // tabela de alunos e situação
     const tr = document.createElement("tr");
     tr.dataset.indice = indice;
 
@@ -258,7 +258,7 @@ function renderizarLista() {
     tr.addEventListener("click", () => selecionarAluno(indice));
     tabelaBody.appendChild(tr);
 
-    // CARDS DE ALUNOS E SITUAÇÃO
+    // CARDS de alunos e situação
     const card = document.createElement("div");
     card.className = "card-aluno";
     card.dataset.indice = indice;
@@ -311,7 +311,7 @@ function renderizarLista() {
 buscaNomeInput.addEventListener("input", renderizarLista);
 filtroStatusSelect.addEventListener("change", renderizarLista);
 
-// gamificação
+// game
 
 function selecionarAluno(indice) {
   indiceAlunoSelecionado = indice;
@@ -331,7 +331,7 @@ function selecionarAluno(indice) {
 function gerarNovoDesafio() {
   if (indiceAlunoSelecionado === null) {
     perguntaDesafioDiv.textContent =
-      "Selecione um aluno na lista para iniciar o desafio.";
+      "Selecione um aluno";
     desafioAtual = null;
     return;
   }
@@ -360,7 +360,7 @@ function gerarNovoDesafio() {
 btnVerificarDesafio.addEventListener("click", () => {
   if (indiceAlunoSelecionado === null) {
     feedbackDesafioDiv.textContent =
-      "Nenhum aluno selecionado. Clique em um aluno na lista.";
+      "Clique em um aluno na lista.";
     feedbackDesafioDiv.className = "feedback erro";
     return;
   }
@@ -405,7 +405,7 @@ btnVerificarDesafio.addEventListener("click", () => {
     feedbackDesafioDiv.className = "feedback erro";
   } else {
     feedbackDesafioDiv.textContent =
-      "Você esgotou suas tentativas. Clique em \"Novo desafio\" para tentar outra conta.";
+      "Você esgotou suas tentativas. Clique em \"Novo desafio\" para tentar novamente.";
     feedbackDesafioDiv.className = "feedback erro";
     btnNovoDesafio.style.display = "block";
   }
@@ -422,6 +422,8 @@ btnToggleDark.addEventListener("click", () => {
 });
 
 
+
 renderizarLista();
 gerarNovoDesafio();
+
 
