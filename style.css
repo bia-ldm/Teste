@@ -504,3 +504,67 @@ body.dark .btn-secondary:hover {
 
     grid-area: desafios;
   }
+
+/* ============================
+   MOBILE — até 899px
+   ============================ */
+@media (max-width: 899px) {
+
+  /* força layout em coluna */
+  .container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 18px;
+  }
+
+  /* tabela some */
+  .table-wrapper {
+    display: none !important;
+  }
+
+  /* cards aparecem */
+  .cards-alunos {
+    display: flex !important;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* impede rolagem horizontal */
+  html, body {
+    overflow-x: hidden !important;
+  }
+}
+
+/* ============================
+   DESKTOP — a partir de 900px
+   ============================ */
+@media (min-width: 900px) {
+
+  .container {
+    display: grid !important;
+    grid-template-columns: 1.1fr 1.9fr;
+    gap: 20px;
+  }
+
+  #sec-form {
+    grid-column: 1;
+  }
+
+  #sec-listagem {
+    grid-column: 2;
+  }
+
+  #sec-gamificacao {
+    grid-column: 2;
+  }
+
+  /* cards somem */
+  .cards-alunos {
+    display: none !important;
+  }
+
+  /* tabela aparece */
+  .table-wrapper {
+    display: block !important;
+  }
+}
